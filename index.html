@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Muayadfit — Cash Flow Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script>
     tailwind.config = {
@@ -14,27 +15,11 @@
           fontFamily: { inter: ['Inter', 'sans-serif'] },
           colors: {
             brand: {
-              50:  '#eff9ff',
-              100: '#dff1fe',
-              200: '#b8e5fd',
-              300: '#7ad2fb',
-              400: '#35bcf7',
-              500: '#0ea5e9',
-              600: '#0284c7',
-              700: '#0369a1',
-              800: '#075985',
-              900: '#0c4a6e',
+              50:'#eff9ff',100:'#dff1fe',200:'#b8e5fd',300:'#7ad2fb',
+              400:'#35bcf7',500:'#0ea5e9',600:'#0284c7',700:'#0369a1',
+              800:'#075985',900:'#0c4a6e',
             },
-            success: {
-              400: '#34d399',
-              500: '#10b981',
-              600: '#059669',
-            },
-            gold: {
-              400: '#fbbf24',
-              500: '#eab308',
-              600: '#ca8a04',
-            }
+            gold: { 400:'#fbbf24', 500:'#eab308', 600:'#ca8a04' }
           }
         }
       }
@@ -42,7 +27,6 @@
   </script>
   <style>
     * { font-family: 'Inter', sans-serif; }
-
     body {
       background: #080c12;
       background-image:
@@ -50,51 +34,20 @@
         radial-gradient(ellipse 40% 30% at 90% 60%, rgba(14,165,233,0.06) 0%, transparent 60%);
       min-height: 100vh;
     }
-
-    /* Scrollbar */
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: #0d1117; }
     ::-webkit-scrollbar-thumb { background: rgba(14,165,233,0.3); border-radius: 4px; }
-
-    /* Glass panels */
-    .glass {
-      background: rgba(13,17,23,0.8);
-      border: 1px solid rgba(255,255,255,0.07);
-      backdrop-filter: blur(16px);
-    }
-    .glass-blue {
-      background: rgba(14,165,233,0.08);
-      border: 1px solid rgba(14,165,233,0.2);
-    }
-    .glass-green {
-      background: rgba(16,185,129,0.07);
-      border: 1px solid rgba(16,185,129,0.2);
-    }
-    .glass-gold {
-      background: rgba(234,179,8,0.07);
-      border: 1px solid rgba(234,179,8,0.2);
-    }
-    .glass-red {
-      background: rgba(239,68,68,0.07);
-      border: 1px solid rgba(239,68,68,0.2);
-    }
-
-    /* Glow shadows */
+    .glass { background: rgba(13,17,23,0.8); border: 1px solid rgba(255,255,255,0.07); backdrop-filter: blur(16px); }
+    .glass-blue { background: rgba(14,165,233,0.08); border: 1px solid rgba(14,165,233,0.2); }
+    .glass-red  { background: rgba(239,68,68,0.07);  border: 1px solid rgba(239,68,68,0.2); }
     .glow-blue  { box-shadow: 0 0 35px rgba(14,165,233,0.18); }
-    .glow-green { box-shadow: 0 0 35px rgba(16,185,129,0.15); }
-    .glow-gold  { box-shadow: 0 0 35px rgba(234,179,8,0.15); }
-    .glow-red   { box-shadow: 0 0 35px rgba(239,68,68,0.15); }
-
-    /* Inputs */
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type="number"] { -moz-appearance: textfield; }
-
     input, textarea, select {
       background: rgba(255,255,255,0.04) !important;
       border: 1px solid rgba(255,255,255,0.09) !important;
-      color: #f1f5f9 !important;
-      outline: none !important;
+      color: #f1f5f9 !important; outline: none !important;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
     input:focus, textarea:focus, select:focus {
@@ -102,121 +55,45 @@
       box-shadow: 0 0 0 3px rgba(14,165,233,0.08) !important;
     }
     input::placeholder { color: #374151 !important; }
+    .service-card { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.06); transition: all 0.2s; }
+    .service-card:hover { border-color: rgba(14,165,233,0.25); background: rgba(14,165,233,0.04); }
+    .btn-primary { background: linear-gradient(135deg,#0284c7,#0ea5e9); color:white; transition:all 0.2s; box-shadow:0 2px 12px rgba(14,165,233,0.3); }
+    .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 22px rgba(14,165,233,0.45); }
+    .btn-ghost { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); color:#6b7280; transition:all 0.2s; }
+    .btn-ghost:hover { background:rgba(255,255,255,0.08); color:#e2e8f0; border-color:rgba(255,255,255,0.15); }
+    .delete-btn { color:#374151; transition:color 0.2s,transform 0.2s; }
+    .delete-btn:hover { color:#ef4444; transform:scale(1.15); }
+    .summary-card { transition:transform 0.2s; }
+    .summary-card:hover { transform:translateY(-3px); }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .fade-in { animation:fadeIn 0.3s ease forwards; }
+    .section-label { font-size:0.62rem; letter-spacing:0.2em; font-weight:700; text-transform:uppercase; color:#0ea5e9; }
+    .divider { border:none; border-top:1px solid rgba(255,255,255,0.05); }
+    .logo-ring { background:linear-gradient(135deg,#0284c7,#38bdf8); box-shadow:0 0 20px rgba(14,165,233,0.4); }
+    .badge { font-size:0.6rem; font-weight:700; letter-spacing:0.08em; padding:2px 7px; border-radius:999px; text-transform:uppercase; }
+    .badge-blue   { background:rgba(14,165,233,0.15);  color:#38bdf8; border:1px solid rgba(14,165,233,0.25); }
+    .badge-silver { background:rgba(148,163,184,0.12); color:#94a3b8; border:1px solid rgba(148,163,184,0.2); }
+    .badge-gold   { background:rgba(234,179,8,0.14);   color:#fbbf24; border:1px solid rgba(234,179,8,0.3); }
+    .badge-promo  { background:rgba(168,85,247,0.13);  color:#c084fc; border:1px solid rgba(168,85,247,0.25); }
+    .sponsor-row { background:rgba(168,85,247,0.04); border:1px solid rgba(168,85,247,0.1); border-radius:10px; transition:all 0.2s; }
+    .sponsor-row:hover { border-color:rgba(168,85,247,0.25); background:rgba(168,85,247,0.07); }
 
-    /* Service cards */
-    .service-card {
-      background: rgba(255,255,255,0.025);
-      border: 1px solid rgba(255,255,255,0.06);
-      transition: all 0.2s;
-    }
-    .service-card:hover {
-      border-color: rgba(14,165,233,0.25);
-      background: rgba(14,165,233,0.04);
-    }
-    .service-card.promo-card:hover {
-      border-color: rgba(234,179,8,0.25);
-      background: rgba(234,179,8,0.04);
-    }
-
-    /* Buttons */
-    .btn-primary {
-      background: linear-gradient(135deg, #0284c7, #0ea5e9);
-      color: white;
-      transition: all 0.2s;
-      box-shadow: 0 2px 12px rgba(14,165,233,0.3);
-    }
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 22px rgba(14,165,233,0.45);
-    }
-    .btn-primary:active { transform: translateY(0); }
-
-    .btn-ghost {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.09);
-      color: #6b7280;
-      transition: all 0.2s;
-    }
-    .btn-ghost:hover {
-      background: rgba(255,255,255,0.08);
-      color: #e2e8f0;
-      border-color: rgba(255,255,255,0.15);
-    }
-
-    .delete-btn {
-      color: #374151;
-      transition: color 0.2s, transform 0.2s;
-    }
-    .delete-btn:hover { color: #ef4444; transform: scale(1.15); }
-
-    /* Summary cards */
-    .summary-card { transition: transform 0.2s; }
-    .summary-card:hover { transform: translateY(-3px); }
-
-    /* Animations */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .fade-in { animation: fadeIn 0.3s ease forwards; }
-
-    /* Typography helpers */
-    .section-label {
-      font-size: 0.62rem;
-      letter-spacing: 0.2em;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: #0ea5e9;
-    }
-    .divider {
-      border: none;
-      border-top: 1px solid rgba(255,255,255,0.05);
-    }
-
-    /* Logo gradient */
-    .logo-ring {
-      background: linear-gradient(135deg, #0284c7, #38bdf8);
-      box-shadow: 0 0 20px rgba(14,165,233,0.4);
-    }
-
-    /* Badge styles */
-    .badge {
-      font-size: 0.6rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      padding: 2px 7px;
-      border-radius: 999px;
-      text-transform: uppercase;
-    }
-    .badge-blue   { background: rgba(14,165,233,0.15); color: #38bdf8; border: 1px solid rgba(14,165,233,0.25); }
-    .badge-silver { background: rgba(148,163,184,0.12); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); }
-    .badge-gold   { background: rgba(234,179,8,0.14);   color: #fbbf24; border: 1px solid rgba(234,179,8,0.3); }
-    .badge-promo  { background: rgba(168,85,247,0.13);  color: #c084fc; border: 1px solid rgba(168,85,247,0.25); }
-
-    /* Sponsor row */
-    .sponsor-row {
-      background: rgba(168,85,247,0.04);
-      border: 1px solid rgba(168,85,247,0.1);
-      border-radius: 10px;
-      transition: all 0.2s;
-    }
-    .sponsor-row:hover {
-      border-color: rgba(168,85,247,0.25);
-      background: rgba(168,85,247,0.07);
-    }
+    /* Sync indicator */
+    #syncStatus { transition: all 0.3s; }
+    .sync-saved  { color:#22c55e; }
+    .sync-saving { color:#f59e0b; }
+    .sync-error  { color:#ef4444; }
   </style>
 </head>
 <body class="min-h-screen text-slate-100 antialiased">
 
-  <!-- Page-level decorative grid -->
-  <div class="fixed inset-0 pointer-events-none" style="background-image: linear-gradient(rgba(14,165,233,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,0.03) 1px, transparent 1px); background-size: 60px 60px;"></div>
+  <div class="fixed inset-0 pointer-events-none" style="background-image:linear-gradient(rgba(14,165,233,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(14,165,233,0.03) 1px,transparent 1px);background-size:60px 60px;"></div>
 
   <div class="relative max-w-3xl mx-auto px-4 py-10 sm:py-14 space-y-6">
 
-    <!-- ══════════════════════════════════════════════ HEADER ══ -->
+    <!-- HEADER -->
     <div class="glass rounded-2xl p-6 sm:p-8 glow-blue">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
-        <!-- Brand -->
         <div class="flex items-center gap-4">
           <div class="logo-ring w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -228,7 +105,6 @@
             <p class="text-xs text-slate-500 mt-0.5 tracking-wide">Cash Flow Tracker</p>
           </div>
         </div>
-        <!-- Month / Year selectors -->
         <div class="flex items-center gap-2">
           <select id="monthSelect" class="rounded-lg px-3 py-2 text-sm font-semibold cursor-pointer">
             <option value="0">January</option><option value="1">February</option>
@@ -238,127 +114,94 @@
             <option value="8">September</option><option value="9">October</option>
             <option value="10">November</option><option value="11">December</option>
           </select>
-          <input id="yearInput" type="number" min="2020" max="2099"
-            class="rounded-lg px-3 py-2 text-sm font-semibold w-24 text-center" />
+          <input id="yearInput" type="number" min="2020" max="2099" class="rounded-lg px-3 py-2 text-sm font-semibold w-24 text-center" />
         </div>
       </div>
-      <!-- Period pill -->
-      <div class="mt-5 pt-4 border-t border-white/5 flex items-center gap-2.5">
-        <span class="w-1.5 h-1.5 rounded-full bg-brand-500 inline-block animate-pulse"></span>
-        <span class="text-slate-500 text-xs tracking-wide">Tracking period: <span id="periodDisplay" class="text-brand-400 font-semibold"></span></span>
+      <div class="mt-5 pt-4 border-t border-white/5 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-brand-500 inline-block animate-pulse"></span>
+          <span class="text-slate-500 text-xs tracking-wide">Period: <span id="periodDisplay" class="text-brand-400 font-semibold"></span></span>
+        </div>
+        <!-- Sync Status -->
+        <span id="syncStatus" class="text-xs font-medium flex items-center gap-1.5 sync-saved">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          <span id="syncText">Saved to cloud</span>
+        </span>
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════ INCOME ══ -->
+    <!-- INCOME -->
     <div class="glass rounded-2xl overflow-hidden">
       <div class="px-6 pt-6 pb-4">
         <span class="section-label">💰 Income</span>
         <h2 class="text-lg font-bold text-white mt-1">Services & Promotions</h2>
       </div>
       <hr class="divider"/>
-
       <div class="p-6 space-y-3">
 
-        <!-- ── Service 1: Simple Structure ── -->
+        <!-- Service 1 -->
         <div class="service-card rounded-xl p-4 fade-in">
           <div class="flex flex-col sm:flex-row sm:items-center gap-3">
             <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 mb-0.5">
-                <span class="badge badge-blue">Plan</span>
-              </div>
+              <div class="flex items-center gap-2 mb-0.5"><span class="badge badge-blue">Plan</span></div>
               <p class="font-semibold text-slate-100 text-sm">📋 Simple Structure</p>
               <p class="text-xs text-slate-600 mt-0.5">Meal Plan + Training Plan</p>
             </div>
             <div class="flex items-center gap-3 flex-shrink-0">
-              <div class="text-right">
-                <p class="text-xs text-slate-600">Price</p>
-                <p class="text-brand-400 font-bold text-sm">30 OMR</p>
-              </div>
-              <div class="text-center">
-                <p class="text-xs text-slate-600 mb-1">Clients</p>
-                <input id="clients1" type="number" min="0" placeholder="0"
-                  class="w-16 rounded-lg px-2 py-2 text-center text-sm font-bold" />
-              </div>
-              <div class="text-right min-w-[90px]">
-                <p class="text-xs text-slate-600">Subtotal</p>
-                <p id="sub1" class="text-white font-bold text-sm">0.000 OMR</p>
-              </div>
+              <div class="text-right"><p class="text-xs text-slate-600">Price</p><p class="text-brand-400 font-bold text-sm">30 OMR</p></div>
+              <div class="text-center"><p class="text-xs text-slate-600 mb-1">Clients</p><input id="clients1" type="number" min="0" placeholder="0" class="w-16 rounded-lg px-2 py-2 text-center text-sm font-bold" /></div>
+              <div class="text-right min-w-[90px]"><p class="text-xs text-slate-600">Subtotal</p><p id="sub1" class="text-white font-bold text-sm">0.000 OMR</p></div>
             </div>
           </div>
         </div>
 
-        <!-- ── Service 2: Silver ── -->
+        <!-- Service 2 -->
         <div class="service-card rounded-xl p-4 fade-in" style="animation-delay:0.05s">
           <div class="flex flex-col sm:flex-row sm:items-center gap-3">
             <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 mb-0.5">
-                <span class="badge badge-silver">Silver</span>
-              </div>
+              <div class="flex items-center gap-2 mb-0.5"><span class="badge badge-silver">Silver</span></div>
               <p class="font-semibold text-slate-100 text-sm">🥈 Silver Coaching</p>
               <p class="text-xs text-slate-600 mt-0.5">Online Coaching Program</p>
             </div>
             <div class="flex items-center gap-3 flex-shrink-0">
-              <div class="text-right">
-                <p class="text-xs text-slate-600">Price</p>
-                <p class="text-brand-400 font-bold text-sm">50 OMR</p>
-              </div>
-              <div class="text-center">
-                <p class="text-xs text-slate-600 mb-1">Clients</p>
-                <input id="clients2" type="number" min="0" placeholder="0"
-                  class="w-16 rounded-lg px-2 py-2 text-center text-sm font-bold" />
-              </div>
-              <div class="text-right min-w-[90px]">
-                <p class="text-xs text-slate-600">Subtotal</p>
-                <p id="sub2" class="text-white font-bold text-sm">0.000 OMR</p>
-              </div>
+              <div class="text-right"><p class="text-xs text-slate-600">Price</p><p class="text-brand-400 font-bold text-sm">50 OMR</p></div>
+              <div class="text-center"><p class="text-xs text-slate-600 mb-1">Clients</p><input id="clients2" type="number" min="0" placeholder="0" class="w-16 rounded-lg px-2 py-2 text-center text-sm font-bold" /></div>
+              <div class="text-right min-w-[90px]"><p class="text-xs text-slate-600">Subtotal</p><p id="sub2" class="text-white font-bold text-sm">0.000 OMR</p></div>
             </div>
           </div>
         </div>
 
-        <!-- ── Service 3: Gold ── -->
+        <!-- Service 3 -->
         <div class="service-card rounded-xl p-4 fade-in" style="animation-delay:0.10s">
           <div class="flex flex-col sm:flex-row sm:items-center gap-3">
             <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 mb-0.5">
-                <span class="badge badge-gold">Gold</span>
-              </div>
+              <div class="flex items-center gap-2 mb-0.5"><span class="badge badge-gold">Gold</span></div>
               <p class="font-semibold text-slate-100 text-sm">🥇 Gold Coaching</p>
               <p class="text-xs text-slate-600 mt-0.5">Upgraded from Silver</p>
             </div>
             <div class="flex items-center gap-3 flex-shrink-0">
-              <div class="text-right">
-                <p class="text-xs text-slate-600">Price</p>
-                <p class="text-gold-400 font-bold text-sm">70 OMR</p>
-              </div>
-              <div class="text-center">
-                <p class="text-xs text-slate-600 mb-1">Clients</p>
-                <input id="clients3" type="number" min="0" placeholder="0"
-                  class="w-16 rounded-lg px-2 py-2 text-center text-sm font-bold" />
-              </div>
-              <div class="text-right min-w-[90px]">
-                <p class="text-xs text-slate-600">Subtotal</p>
-                <p id="sub3" class="text-white font-bold text-sm">0.000 OMR</p>
-              </div>
+              <div class="text-right"><p class="text-xs text-slate-600">Price</p><p class="text-yellow-400 font-bold text-sm">70 OMR</p></div>
+              <div class="text-center"><p class="text-xs text-slate-600 mb-1">Clients</p><input id="clients3" type="number" min="0" placeholder="0" class="w-16 rounded-lg px-2 py-2 text-center text-sm font-bold" /></div>
+              <div class="text-right min-w-[90px]"><p class="text-xs text-slate-600">Subtotal</p><p id="sub3" class="text-white font-bold text-sm">0.000 OMR</p></div>
             </div>
           </div>
         </div>
 
-        <!-- ── SPONSORSHIP DIVIDER ── -->
+        <!-- Sponsorship divider -->
         <div class="flex items-center gap-3 pt-1">
           <div class="flex-1 h-px" style="background:rgba(168,85,247,0.15);"></div>
           <span class="text-xs text-purple-400 font-semibold tracking-widest uppercase">Content & Sponsorships</span>
           <div class="flex-1 h-px" style="background:rgba(168,85,247,0.15);"></div>
         </div>
 
-        <!-- ── Sponsorship / Promotions ── -->
+        <!-- Sponsorships -->
         <div class="rounded-xl p-4 fade-in" style="background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.15);animation-delay:0.15s">
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center gap-2">
               <span class="badge badge-promo">Promo</span>
               <p class="font-semibold text-slate-100 text-sm">📣 Sponsorships & Promotions</p>
             </div>
-            <button onclick="addSponsor()"
-              class="text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all"
+            <button onclick="addSponsor()" class="text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all"
               style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.25);color:#c084fc;"
               onmouseover="this.style.background='rgba(168,85,247,0.25)'" onmouseout="this.style.background='rgba(168,85,247,0.15)'">
               <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -366,21 +209,16 @@
             </button>
           </div>
           <p class="text-xs text-slate-600 mb-3">Track paid brand deals, product promotions, and sponsored content.</p>
-
-          <!-- Sponsor rows list -->
           <div id="sponsorList" class="space-y-2"></div>
           <div id="noSponsors" class="text-center text-slate-700 text-xs italic py-2">No sponsorship deals added yet.</div>
-
-          <!-- Sponsor subtotal -->
           <div class="mt-3 pt-3 border-t border-purple-900/30 flex items-center justify-between">
             <span class="text-xs text-purple-400 font-semibold">Sponsorship Total</span>
             <p id="subSponsor" class="text-purple-300 font-black text-base">0.000 OMR</p>
           </div>
         </div>
+      </div>
 
-      </div><!-- /service cards -->
-
-      <!-- Total Income banner -->
+      <!-- Total Income -->
       <div class="glass-blue mx-4 mb-6 rounded-xl px-5 py-4 flex items-center justify-between glow-blue">
         <div class="flex items-center gap-2">
           <svg width="16" height="16" fill="none" stroke="#0ea5e9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
@@ -390,7 +228,7 @@
       </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════ EXPENSES ══ -->
+    <!-- EXPENSES -->
     <div class="glass rounded-2xl overflow-hidden">
       <div class="px-6 pt-6 pb-4 flex items-center justify-between">
         <div>
@@ -403,11 +241,8 @@
         </button>
       </div>
       <hr class="divider"/>
-
       <div id="expensesList" class="p-6 space-y-2.5 min-h-[60px]"></div>
-      <div id="noExpenses" class="px-6 pb-4 text-center text-slate-700 text-xs italic">No expenses added yet. Click "+ Add Expense" to start.</div>
-
-      <!-- Total Expenses banner -->
+      <div id="noExpenses" class="px-6 pb-4 text-center text-slate-700 text-xs italic">No expenses added yet.</div>
       <div class="glass-red mx-4 mb-6 rounded-xl px-5 py-4 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <svg width="16" height="16" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
@@ -417,12 +252,10 @@
       </div>
     </div>
 
-    <!-- ═══════════════════════════════════ CASH FLOW SUMMARY ══ -->
+    <!-- CASH FLOW SUMMARY -->
     <div>
       <span class="section-label">📊 Cash Flow Summary</span>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3">
-
-        <!-- Earnings -->
         <div class="summary-card glass rounded-2xl p-5 glow-blue">
           <div class="flex items-center gap-2 mb-3">
             <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(14,165,233,0.15);">
@@ -433,8 +266,6 @@
           <p id="summaryIncome" class="text-brand-400 font-black text-2xl sm:text-3xl leading-none tracking-tight">0.000</p>
           <p class="text-slate-700 text-xs mt-1.5">OMR this month</p>
         </div>
-
-        <!-- Spending -->
         <div class="summary-card glass rounded-2xl p-5">
           <div class="flex items-center gap-2 mb-3">
             <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(239,68,68,0.12);">
@@ -445,8 +276,6 @@
           <p id="summaryExpenses" class="text-red-400 font-black text-2xl sm:text-3xl leading-none tracking-tight">0.000</p>
           <p class="text-slate-700 text-xs mt-1.5">OMR this month</p>
         </div>
-
-        <!-- Net Cash Flow -->
         <div id="netCard" class="summary-card glass rounded-2xl p-5 glow-blue">
           <div class="flex items-center gap-2 mb-3">
             <div id="netIconBg" class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(14,165,233,0.15);">
@@ -459,11 +288,10 @@
           <p id="summaryNet" class="text-brand-400 font-black text-2xl sm:text-3xl leading-none tracking-tight">0.000</p>
           <p class="text-slate-700 text-xs mt-1.5">OMR profit / loss</p>
         </div>
-
       </div>
     </div>
 
-    <!-- ════════════════════════════════════════ ACTION BUTTONS ══ -->
+    <!-- ACTION BUTTONS -->
     <div class="flex flex-col sm:flex-row gap-3 pt-1">
       <button onclick="exportCSV()" class="btn-ghost rounded-xl px-5 py-3 text-sm font-semibold flex items-center justify-center gap-2 flex-1">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -479,152 +307,200 @@
     <!-- Footer -->
     <div class="text-center pb-4 pt-2">
       <p class="text-slate-700 text-xs">Muayadfit Cash Flow Tracker — <a href="https://muayadfit.com" target="_blank" class="text-brand-700 hover:text-brand-500 transition-colors">muayadfit.com</a></p>
-      <p class="text-slate-800 text-xs mt-1">🔒 All data saved locally in your browser</p>
+      <p class="text-slate-800 text-xs mt-1">☁️ Data synced to Supabase cloud database</p>
     </div>
 
   </div><!-- /container -->
 
-  <!-- ════════════════════════════════════════════ JAVASCRIPT ══ -->
   <script>
-    const PRICES = [30, 50, 70];
+    // ══════════════════════════════════════════════════════════════
+    // SUPABASE CONFIG — filled in automatically
+    // ══════════════════════════════════════════════════════════════
+    const SUPABASE_URL  = 'https://sxkqrpmklqbyjausdpiv.supabase.co';
+    const SUPABASE_KEY  = 'sb_publishable_JIT_yRO7peKshta-7lt0kQ_7bMzxBtr';
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // ── Constants ─────────────────────────────────────────────────
     const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    let expenses = [], sponsors = [];
+    let saveTimer = null;
 
-    let expenses   = [];
-    let sponsors   = [];
+    // ── Sync UI ───────────────────────────────────────────────────
+    function setSyncStatus(state) {
+      const el   = document.getElementById('syncStatus');
+      const text = document.getElementById('syncText');
+      el.className = 'text-xs font-medium flex items-center gap-1.5';
+      if (state === 'saving') {
+        el.classList.add('sync-saving');
+        el.innerHTML = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-9-9"/></svg><span>Saving…</span>`;
+      } else if (state === 'saved') {
+        el.classList.add('sync-saved');
+        el.innerHTML = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Saved to cloud</span>`;
+      } else {
+        el.classList.add('sync-error');
+        el.innerHTML = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Save failed</span>`;
+      }
+    }
 
-    // ── Load ──────────────────────────────────────────────────────
-    function loadData() {
-      const now   = new Date();
-      const saved = JSON.parse(localStorage.getItem('muayadfit_cf_v2') || '{}');
+    // ── Period key ────────────────────────────────────────────────
+    function getPeriodKey() {
+      const m = String(parseInt(document.getElementById('monthSelect').value) + 1).padStart(2,'0');
+      const y = document.getElementById('yearInput').value || new Date().getFullYear();
+      return `${y}-${m}`;
+    }
 
-      document.getElementById('monthSelect').value = saved.month ?? now.getMonth();
-      document.getElementById('yearInput').value   = saved.year  ?? now.getFullYear();
+    // ── Load from Supabase ────────────────────────────────────────
+    async function loadData() {
+      const now = new Date();
 
-      document.getElementById('clients1').value = saved.clients1 ?? '';
-      document.getElementById('clients2').value = saved.clients2 ?? '';
-      document.getElementById('clients3').value = saved.clients3 ?? '';
+      // Set date selectors (fallback = current date)
+      const cached = JSON.parse(localStorage.getItem('mf_period') || '{}');
+      document.getElementById('monthSelect').value = cached.month ?? now.getMonth();
+      document.getElementById('yearInput').value   = cached.year  ?? now.getFullYear();
 
-      expenses = saved.expenses || [];
-      sponsors = saved.sponsors || [];
+      const key = getPeriodKey();
 
+      setSyncStatus('saving');
+      const { data, error } = await db
+        .from('cashflow_data')
+        .select('*')
+        .eq('period_key', key)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        // PGRST116 = no rows found (first time for this period) — not a real error
+        console.error('Load error:', error);
+        setSyncStatus('error');
+        // Try fallback from localStorage
+        const fb = JSON.parse(localStorage.getItem('muayadfit_cf_v2') || '{}');
+        applyData(fb);
+        return;
+      }
+
+      if (data) {
+        applyData(data);
+      } else {
+        applyData({});
+      }
+      setSyncStatus('saved');
+    }
+
+    function applyData(d) {
+      document.getElementById('clients1').value = d.clients1 ?? '';
+      document.getElementById('clients2').value = d.clients2 ?? '';
+      document.getElementById('clients3').value = d.clients3 ?? '';
+      expenses = d.expenses || [];
+      sponsors = d.sponsors || [];
       renderExpenses();
       renderSponsors();
       recalculate();
     }
 
-    // ── Save ──────────────────────────────────────────────────────
-    function saveData() {
-      localStorage.setItem('muayadfit_cf_v2', JSON.stringify({
-        month:    parseInt(document.getElementById('monthSelect').value),
-        year:     parseInt(document.getElementById('yearInput').value),
-        clients1: parseFloat(document.getElementById('clients1').value) || 0,
-        clients2: parseFloat(document.getElementById('clients2').value) || 0,
-        clients3: parseFloat(document.getElementById('clients3').value) || 0,
-        expenses,
-        sponsors
-      }));
+    // ── Save to Supabase (debounced 600ms) ────────────────────────
+    function scheduleSave() {
+      clearTimeout(saveTimer);
+      setSyncStatus('saving');
+      saveTimer = setTimeout(async () => {
+        const key = getPeriodKey();
+        const m   = parseInt(document.getElementById('monthSelect').value);
+        const y   = parseInt(document.getElementById('yearInput').value);
+
+        // Also remember period in localStorage so browser remembers which month was open
+        localStorage.setItem('mf_period', JSON.stringify({ month: m, year: y }));
+
+        const payload = {
+          period_key: key,
+          month:      m,
+          year:       y,
+          clients1:   parseFloat(document.getElementById('clients1').value) || 0,
+          clients2:   parseFloat(document.getElementById('clients2').value) || 0,
+          clients3:   parseFloat(document.getElementById('clients3').value) || 0,
+          expenses:   expenses,
+          sponsors:   sponsors,
+        };
+
+        const { error } = await db
+          .from('cashflow_data')
+          .upsert(payload, { onConflict: 'period_key' });
+
+        if (error) {
+          console.error('Save error:', error);
+          setSyncStatus('error');
+        } else {
+          setSyncStatus('saved');
+        }
+      }, 600);
     }
 
     // ── Recalculate ───────────────────────────────────────────────
     function recalculate() {
       const fmt = n => n.toFixed(3) + ' OMR';
-
       const c1 = parseFloat(document.getElementById('clients1').value) || 0;
       const c2 = parseFloat(document.getElementById('clients2').value) || 0;
       const c3 = parseFloat(document.getElementById('clients3').value) || 0;
+      const s1 = c1*30, s2 = c2*50, s3 = c3*70;
+      const sponsorTotal = sponsors.reduce((a,s) => a+(parseFloat(s.amount)||0), 0);
+      const income   = s1+s2+s3+sponsorTotal;
+      const totalExp = expenses.reduce((a,e) => a+(parseFloat(e.amount)||0), 0);
+      const net      = income - totalExp;
 
-      const s1 = c1 * 30, s2 = c2 * 50, s3 = c3 * 70;
-
-      const sponsorTotal = sponsors.reduce((a, s) => a + (parseFloat(s.amount) || 0), 0);
-      const income       = s1 + s2 + s3 + sponsorTotal;
-      const totalExp     = expenses.reduce((a, e) => a + (parseFloat(e.amount) || 0), 0);
-      const net          = income - totalExp;
-
-      // Service subtotals
       document.getElementById('sub1').textContent = fmt(s1);
       document.getElementById('sub2').textContent = fmt(s2);
       document.getElementById('sub3').textContent = fmt(s3);
-
-      // Sponsor subtotal
       document.getElementById('subSponsor').textContent = fmt(sponsorTotal);
-
-      // Totals
       document.getElementById('totalIncome').textContent   = fmt(income);
       document.getElementById('totalExpenses').textContent = fmt(totalExp);
       document.getElementById('summaryIncome').textContent   = income.toFixed(3);
       document.getElementById('summaryExpenses').textContent = totalExp.toFixed(3);
 
-      // Net
-      const netEl     = document.getElementById('summaryNet');
-      const netCard   = document.getElementById('netCard');
+      const netEl = document.getElementById('summaryNet');
+      const netCard = document.getElementById('netCard');
       const netIconBg = document.getElementById('netIconBg');
-      const netSvg    = document.getElementById('netIconSvg');
-
-      netEl.textContent = (net < 0 ? '-' : '') + Math.abs(net).toFixed(3);
-
+      const netSvg = document.getElementById('netIconSvg');
+      netEl.textContent = (net<0?'-':'')+Math.abs(net).toFixed(3);
       if (net >= 0) {
-        netEl.className    = 'text-brand-400 font-black text-2xl sm:text-3xl leading-none tracking-tight';
-        netCard.style.boxShadow   = '0 0 35px rgba(14,165,233,0.18)';
+        netEl.className = 'text-brand-400 font-black text-2xl sm:text-3xl leading-none tracking-tight';
+        netCard.style.boxShadow = '0 0 35px rgba(14,165,233,0.18)';
         netCard.style.borderColor = 'rgba(14,165,233,0.18)';
         netIconBg.style.background = 'rgba(14,165,233,0.15)';
-        netSvg.setAttribute('stroke', '#0ea5e9');
+        netSvg.setAttribute('stroke','#0ea5e9');
       } else {
-        netEl.className    = 'text-red-400 font-black text-2xl sm:text-3xl leading-none tracking-tight';
-        netCard.style.boxShadow   = '0 0 35px rgba(239,68,68,0.18)';
+        netEl.className = 'text-red-400 font-black text-2xl sm:text-3xl leading-none tracking-tight';
+        netCard.style.boxShadow = '0 0 35px rgba(239,68,68,0.18)';
         netCard.style.borderColor = 'rgba(239,68,68,0.2)';
         netIconBg.style.background = 'rgba(239,68,68,0.12)';
-        netSvg.setAttribute('stroke', '#ef4444');
+        netSvg.setAttribute('stroke','#ef4444');
       }
 
-      // Period display
-      const m = parseInt(document.getElementById('monthSelect').value);
-      const y = document.getElementById('yearInput').value || new Date().getFullYear();
-      document.getElementById('periodDisplay').textContent = MONTH_NAMES[m] + ' ' + y;
-
-      saveData();
+      const mo = parseInt(document.getElementById('monthSelect').value);
+      const yr = document.getElementById('yearInput').value || new Date().getFullYear();
+      document.getElementById('periodDisplay').textContent = MONTH_NAMES[mo] + ' ' + yr;
     }
+
+    function recalcAndSave() { recalculate(); scheduleSave(); }
 
     // ── Expenses ──────────────────────────────────────────────────
     function addExpense() {
-      expenses.push({ desc: '', amount: '' });
-      renderExpenses();
-      recalculate();
-      setTimeout(() => {
-        const ins = document.querySelectorAll('.exp-desc');
-        if (ins.length) ins[ins.length - 1].focus();
-      }, 50);
+      expenses.push({desc:'',amount:''});
+      renderExpenses(); recalcAndSave();
+      setTimeout(() => { const ins=document.querySelectorAll('.exp-desc'); if(ins.length) ins[ins.length-1].focus(); }, 50);
     }
-
-    function deleteExpense(i) {
-      expenses.splice(i, 1);
-      renderExpenses();
-      recalculate();
-    }
-
+    function deleteExpense(i) { expenses.splice(i,1); renderExpenses(); recalcAndSave(); }
     function renderExpenses() {
-      const list = document.getElementById('expensesList');
-      const noEl = document.getElementById('noExpenses');
-      list.innerHTML = '';
-      noEl.style.display = expenses.length === 0 ? 'block' : 'none';
-
-      expenses.forEach((exp, i) => {
-        const row = document.createElement('div');
-        row.className = 'fade-in flex items-center gap-2.5';
-        row.innerHTML = `
-          <div class="flex-1 min-w-0">
-            <input type="text" placeholder="Expense description…" class="w-full rounded-lg px-3 py-2.5 text-sm exp-desc"
-              value="${esc(exp.desc)}" oninput="expenses[${i}].desc=this.value; recalculate();" />
-          </div>
-          <div class="w-28 flex-shrink-0">
-            <input type="number" min="0" step="0.001" placeholder="0.000" class="w-full rounded-lg px-3 py-2.5 text-sm text-right exp-amt"
-              value="${exp.amount}" oninput="expenses[${i}].amount=this.value; recalculate();" />
-          </div>
+      const list=document.getElementById('expensesList');
+      const noEl=document.getElementById('noExpenses');
+      list.innerHTML=''; noEl.style.display=expenses.length===0?'block':'none';
+      expenses.forEach((exp,i) => {
+        const row=document.createElement('div');
+        row.className='fade-in flex items-center gap-2.5';
+        row.innerHTML=`
+          <div class="flex-1 min-w-0"><input type="text" placeholder="Expense description…" class="w-full rounded-lg px-3 py-2.5 text-sm exp-desc"
+            value="${esc(exp.desc)}" oninput="expenses[${i}].desc=this.value; recalcAndSave();" /></div>
+          <div class="w-28 flex-shrink-0"><input type="number" min="0" step="0.001" placeholder="0.000" class="w-full rounded-lg px-3 py-2.5 text-sm text-right"
+            value="${exp.amount}" oninput="expenses[${i}].amount=this.value; recalcAndSave();" /></div>
           <span class="text-slate-600 text-xs font-medium flex-shrink-0">OMR</span>
-          <button onclick="deleteExpense(${i})" class="delete-btn flex-shrink-0" title="Delete expense">
-            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24">
-              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
-              <path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
-            </svg>
+          <button onclick="deleteExpense(${i})" class="delete-btn flex-shrink-0" title="Delete">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
           </button>`;
         list.appendChild(row);
       });
@@ -632,111 +508,83 @@
 
     // ── Sponsors ──────────────────────────────────────────────────
     function addSponsor() {
-      sponsors.push({ brand: '', amount: '' });
-      renderSponsors();
-      recalculate();
-      setTimeout(() => {
-        const ins = document.querySelectorAll('.sp-brand');
-        if (ins.length) ins[ins.length - 1].focus();
-      }, 50);
+      sponsors.push({brand:'',amount:''});
+      renderSponsors(); recalcAndSave();
+      setTimeout(() => { const ins=document.querySelectorAll('.sp-brand'); if(ins.length) ins[ins.length-1].focus(); }, 50);
     }
-
-    function deleteSponsor(i) {
-      sponsors.splice(i, 1);
-      renderSponsors();
-      recalculate();
-    }
-
+    function deleteSponsor(i) { sponsors.splice(i,1); renderSponsors(); recalcAndSave(); }
     function renderSponsors() {
-      const list = document.getElementById('sponsorList');
-      const noEl = document.getElementById('noSponsors');
-      list.innerHTML = '';
-      noEl.style.display = sponsors.length === 0 ? 'block' : 'none';
-
-      sponsors.forEach((sp, i) => {
-        const row = document.createElement('div');
-        row.className = 'fade-in sponsor-row flex items-center gap-2.5 px-3 py-2.5';
-        row.innerHTML = `
+      const list=document.getElementById('sponsorList');
+      const noEl=document.getElementById('noSponsors');
+      list.innerHTML=''; noEl.style.display=sponsors.length===0?'block':'none';
+      sponsors.forEach((sp,i) => {
+        const row=document.createElement('div');
+        row.className='fade-in sponsor-row flex items-center gap-2.5 px-3 py-2.5';
+        row.innerHTML=`
           <span class="text-purple-500 text-sm flex-shrink-0">📣</span>
-          <div class="flex-1 min-w-0">
-            <input type="text" placeholder="Brand / product name…" class="w-full rounded-lg px-2.5 py-2 text-sm sp-brand"
-              value="${esc(sp.brand)}" oninput="sponsors[${i}].brand=this.value; recalculate();" />
-          </div>
-          <div class="w-28 flex-shrink-0">
-            <input type="number" min="0" step="0.001" placeholder="0.000" class="w-full rounded-lg px-2.5 py-2 text-sm text-right"
-              value="${sp.amount}" oninput="sponsors[${i}].amount=this.value; recalculate();" />
-          </div>
+          <div class="flex-1 min-w-0"><input type="text" placeholder="Brand / product name…" class="w-full rounded-lg px-2.5 py-2 text-sm sp-brand"
+            value="${esc(sp.brand)}" oninput="sponsors[${i}].brand=this.value; recalcAndSave();" /></div>
+          <div class="w-28 flex-shrink-0"><input type="number" min="0" step="0.001" placeholder="0.000" class="w-full rounded-lg px-2.5 py-2 text-sm text-right"
+            value="${sp.amount}" oninput="sponsors[${i}].amount=this.value; recalcAndSave();" /></div>
           <span class="text-slate-600 text-xs font-medium flex-shrink-0">OMR</span>
-          <button onclick="deleteSponsor(${i})" class="delete-btn flex-shrink-0" title="Delete deal">
-            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24">
-              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
-              <path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
-            </svg>
+          <button onclick="deleteSponsor(${i})" class="delete-btn flex-shrink-0" title="Delete">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
           </button>`;
         list.appendChild(row);
       });
     }
 
-    // ── Utilities ────────────────────────────────────────────────
-    function esc(str) {
-      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
+    // ── Utilities ─────────────────────────────────────────────────
+    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-    // ── Reset ────────────────────────────────────────────────────
-    function confirmReset() {
+    // ── Reset ─────────────────────────────────────────────────────
+    async function confirmReset() {
       if (!confirm('Reset all data for this month? This cannot be undone.')) return;
+      const key = getPeriodKey();
+      await db.from('cashflow_data').delete().eq('period_key', key);
       const now = new Date();
       document.getElementById('monthSelect').value = now.getMonth();
       document.getElementById('yearInput').value   = now.getFullYear();
-      ['clients1','clients2','clients3'].forEach(id => document.getElementById(id).value = '');
-      expenses = []; sponsors = [];
+      ['clients1','clients2','clients3'].forEach(id => document.getElementById(id).value='');
+      expenses=[]; sponsors=[];
       renderExpenses(); renderSponsors(); recalculate();
+      setSyncStatus('saved');
     }
 
     // ── Export CSV ────────────────────────────────────────────────
     function exportCSV() {
-      const m = MONTH_NAMES[parseInt(document.getElementById('monthSelect').value)];
-      const y = document.getElementById('yearInput').value;
-
-      const c1 = parseFloat(document.getElementById('clients1').value) || 0;
-      const c2 = parseFloat(document.getElementById('clients2').value) || 0;
-      const c3 = parseFloat(document.getElementById('clients3').value) || 0;
-      const s1 = c1*30, s2 = c2*50, s3 = c3*70;
-      const sponTotal = sponsors.reduce((a,s) => a+(parseFloat(s.amount)||0), 0);
-      const income    = s1+s2+s3+sponTotal;
-      const totalExp  = expenses.reduce((a,e) => a+(parseFloat(e.amount)||0), 0);
-      const net       = income - totalExp;
-
-      let csv = `Muayadfit Cash Flow Report — ${m} ${y}\n\n`;
-      csv += `INCOME — SERVICES\n`;
-      csv += `Service,Clients,Price (OMR),Subtotal (OMR)\n`;
-      csv += `Simple Structure (Meal + Training),${c1},30,${s1.toFixed(3)}\n`;
-      csv += `Silver Online Coaching,${c2},50,${s2.toFixed(3)}\n`;
-      csv += `Gold Online Coaching,${c3},70,${s3.toFixed(3)}\n\n`;
-      csv += `INCOME — SPONSORSHIPS & PROMOTIONS\n`;
-      csv += `Brand / Product,Amount (OMR)\n`;
-      sponsors.forEach(s => csv += `${s.brand||'Unnamed'},${(parseFloat(s.amount)||0).toFixed(3)}\n`);
-      csv += `Sponsorship Total,,${sponTotal.toFixed(3)}\n\n`;
-      csv += `Total Income,,,${income.toFixed(3)}\n\n`;
-      csv += `EXPENSES\n`;
-      csv += `Description,Amount (OMR)\n`;
-      expenses.forEach(e => csv += `${e.desc||'Unnamed'},${(parseFloat(e.amount)||0).toFixed(3)}\n`);
-      csv += `Total Expenses,,${totalExp.toFixed(3)}\n\n`;
-      csv += `NET CASH FLOW (OMR),${net.toFixed(3)}\n`;
-
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const a    = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `muayadfit-cashflow-${m}-${y}.csv` });
-      a.click();
-      URL.revokeObjectURL(a.href);
+      const m=MONTH_NAMES[parseInt(document.getElementById('monthSelect').value)];
+      const y=document.getElementById('yearInput').value;
+      const c1=parseFloat(document.getElementById('clients1').value)||0;
+      const c2=parseFloat(document.getElementById('clients2').value)||0;
+      const c3=parseFloat(document.getElementById('clients3').value)||0;
+      const s1=c1*30,s2=c2*50,s3=c3*70;
+      const sponTotal=sponsors.reduce((a,s)=>a+(parseFloat(s.amount)||0),0);
+      const income=s1+s2+s3+sponTotal;
+      const totalExp=expenses.reduce((a,e)=>a+(parseFloat(e.amount)||0),0);
+      const net=income-totalExp;
+      let csv=`Muayadfit Cash Flow Report — ${m} ${y}\n\n`;
+      csv+=`INCOME — SERVICES\nService,Clients,Price (OMR),Subtotal (OMR)\n`;
+      csv+=`Simple Structure,${c1},30,${s1.toFixed(3)}\nSilver Coaching,${c2},50,${s2.toFixed(3)}\nGold Coaching,${c3},70,${s3.toFixed(3)}\n\n`;
+      csv+=`INCOME — SPONSORSHIPS\nBrand,Amount (OMR)\n`;
+      sponsors.forEach(s=>csv+=`${s.brand||'Unnamed'},${(parseFloat(s.amount)||0).toFixed(3)}\n`);
+      csv+=`Sponsorship Total,,${sponTotal.toFixed(3)}\nTotal Income,,,${income.toFixed(3)}\n\nEXPENSES\nDescription,Amount (OMR)\n`;
+      expenses.forEach(e=>csv+=`${e.desc||'Unnamed'},${(parseFloat(e.amount)||0).toFixed(3)}\n`);
+      csv+=`Total Expenses,,${totalExp.toFixed(3)}\n\nNET CASH FLOW (OMR),${net.toFixed(3)}\n`;
+      const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([csv],{type:'text/csv'})),download:`muayadfit-cashflow-${m}-${y}.csv`});
+      a.click(); URL.revokeObjectURL(a.href);
     }
 
-    // ── Event Listeners ──────────────────────────────────────────
-    ['clients1','clients2','clients3'].forEach(id =>
-      document.getElementById(id).addEventListener('input', recalculate));
-    document.getElementById('monthSelect').addEventListener('change', recalculate);
-    document.getElementById('yearInput').addEventListener('input', recalculate);
+    // ── Period change: reload from Supabase ───────────────────────
+    function onPeriodChange() { recalculate(); loadData(); }
 
-    // ── Init ─────────────────────────────────────────────────────
+    // ── Event Listeners ───────────────────────────────────────────
+    ['clients1','clients2','clients3'].forEach(id =>
+      document.getElementById(id).addEventListener('input', recalcAndSave));
+    document.getElementById('monthSelect').addEventListener('change', onPeriodChange);
+    document.getElementById('yearInput').addEventListener('change', onPeriodChange);
+
+    // ── Init ──────────────────────────────────────────────────────
     loadData();
   </script>
 </body>
